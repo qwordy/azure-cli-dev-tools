@@ -18,7 +18,7 @@ from knack.util import CLIError
 from azdev.utilities import (
     display, output, heading, subheading,
     cmd as raw_cmd, py_cmd, pip_cmd, find_file, IS_WINDOWS,
-    ENV_VAR_TEST_LIVE,
+    ENV_VAR_TEST_LIVE, ENV_VAR_TEST_P0, ENV_VAR_TEST_P1,
     COMMAND_MODULE_PREFIX, EXTENSION_PREFIX,
     make_dirs, get_azdev_config_dir,
     get_path_table, require_virtual_env, get_name_index)
@@ -30,7 +30,7 @@ logger = get_logger(__name__)
 # pylint: disable=too-many-statements
 def run_tests(tests, xml_path=None, discover=False, in_series=False,
               run_live=False, profile=None, last_failed=False, pytest_args=None,
-              git_source=None, git_target=None, git_repo=None):
+              git_source=None, git_target=None, git_repo=None, run_p0=False, run_p1=False):
 
     require_virtual_env()
 
@@ -68,6 +68,14 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
     if run_live:
         logger.warning('RUNNING TESTS LIVE')
         os.environ[ENV_VAR_TEST_LIVE] = 'True'
+
+    if run_p0:
+        logger.warning('RUNNING P0 TESTS')
+        os.environ[ENV_VAR_TEST_P0] = 'True'
+
+    if run_p1:
+        logger.warning('RUNNING P0 AND P1 TESTS')
+        os.environ[ENV_VAR_TEST_P1] = 'True'
 
     def _find_test(index, name):
         name_comps = name.split('.')

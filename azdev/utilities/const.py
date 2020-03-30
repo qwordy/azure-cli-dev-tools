@@ -14,3 +14,5 @@ IS_WINDOWS = sys.platform.lower() in ['windows', 'win32']
 ENV_VAR_TEST_MODULES = 'AZDEV_TEST_TESTS'               # comma-separated list of modules to test
 ENV_VAR_VIRTUAL_ENV = ['VIRTUAL_ENV', 'CONDA_PREFIX']   # used by system to identify virtual environment
 ENV_VAR_TEST_LIVE = 'AZURE_TEST_RUN_LIVE'               # denotes that tests should be run live instead of played back
+ENV_VAR_TEST_P0 = 'AZURE_TEST_RUN_P0'                   # only run p0 tests
+ENV_VAR_TEST_P1 = 'AZURE_TEST_RUN_P1'                   # only run p0 and p1 tests

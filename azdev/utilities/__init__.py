@@ -22,6 +22,8 @@ from .const import (
     IS_WINDOWS,
     ENV_VAR_TEST_MODULES,
     ENV_VAR_TEST_LIVE,
+    ENV_VAR_TEST_P0,
+    ENV_VAR_TEST_P1,
     ENV_VAR_VIRTUAL_ENV,
     EXT_REPO_NAME
 )
@@ -75,6 +77,8 @@ __all__ = [
     'get_azdev_config',
     'ENV_VAR_TEST_MODULES',
     'ENV_VAR_TEST_LIVE',
+    'ENV_VAR_TEST_P0',
+    'ENV_VAR_TEST_P1',
     'ENV_VAR_VIRTUAL_ENV',
     'EXT_REPO_NAME',
     'IS_WINDOWS',
