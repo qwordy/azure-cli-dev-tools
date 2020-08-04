@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # -----------------------------------------------------------------------------
-
+import configparser
 import glob
 from importlib import import_module
 import json
@@ -34,7 +34,9 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
               run_live=False, profile=None, last_failed=False, pytest_args=None,
               no_exit_first=False,
               git_source=None, git_target=None, git_repo=None,
-              cli_ci=False):
+              cli_ci=False, mode=None):
+
+    print(tests)
 
     require_virtual_env()
 
@@ -90,15 +92,45 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
                 continue
         raise key_error
 
+    if mode == 'Sequential':
+        if len(modified_mods) == 1:
+            target = modified_mods[0]
+            modified_mods = []
+            # If it is a module
+            if not target.startswith('test') and all(c.islower() or c == '-' for c in target):
+                test_path = os.path.normpath(_find_test(test_index, target))
+                print(test_path)
+                config_path = os.path.join(test_path, 'config.ini')
+                # If config file exists
+                if os.path.exists(config_path):
+                    print(config_path)
+                    config = configparser.ConfigParser()
+                    config.read(config_path)
+                    print(config.sections())
+                    if 'Sequential' in config:
+                        for key in config['Sequential']:
+                            print(key)
+                            modified_mods.append(key)
+    elif mode == 'Parallel':
+        if len(modified_mods) == 1:
+            target = modified_mods[0]
+            modified_mods = load_test_from_module(target)
+        pass
+
     # lookup test paths from index
     test_paths = []
     for t in modified_mods:
         try:
+            # print(len(test_index))
+            # print(test_index['vm'])
+            # print(test_index)
             test_path = os.path.normpath(_find_test(test_index, t))
+            # print(test_path)
             test_paths.append(test_path)
         except KeyError:
             logger.warning("'%s' not found. If newly added, re-run with --discover", t)
             continue
+    print(test_paths)
 
     exit_code = 0
 
@@ -282,6 +314,8 @@ def _discover_tests(profile):
                              "Please rename one or both and re-run --discover.", key, mod1)
         else:
             test_index[key] = path
+
+    print(module_data)
 
     # build the index
     for mod_name, mod_data in module_data.items():

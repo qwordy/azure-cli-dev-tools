@@ -7,6 +7,7 @@
 # pylint: disable=line-too-long
 import argparse
 
+from azure.cli.core.commands.parameters import get_enum_type
 from knack.arguments import ArgumentsContext, CLIArgumentType
 
 from azdev.completer import get_test_completion
@@ -53,6 +54,7 @@ def load_arguments(self, _):
         c.argument('pytest_args', nargs=argparse.REMAINDER, options_list=['--pytest-args', '-a'], help='Denotes the remaining args will be passed to pytest.')
         c.argument('last_failed', options_list='--lf', action='store_true', help='Re-run the last tests that failed.')
         c.argument('no_exit_first', options_list='--no-exitfirst', action='store_true', help='Do not exit on first error or failed test')
+        c.argument('mode', arg_type=get_enum_type(['Sequential', 'Parallel']), help='Run test cases according to config file.')
 
         # CI parameters
         c.argument('cli_ci',
