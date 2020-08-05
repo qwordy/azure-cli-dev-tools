@@ -114,7 +114,8 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
     elif mode == 'Parallel':
         if len(modified_mods) == 1:
             target = modified_mods[0]
-            modified_mods = load_test_from_module(target)
+            modified_mods = load_test_from_module(target, profile or current_profile())
+            print(modified_mods)
         pass
 
     # lookup test paths from index
@@ -180,6 +181,41 @@ def _filter_by_git_diff(tests, test_index, git_source, git_target, git_repo):
     logger.info('Filtered out: %s', to_remove)
 
     return tests
+
+
+def load_test_from_module(mod_name, profile):
+    """
+
+    :param mod_name: Module name
+    :param profile: profile, e.g. latest
+    :return: A list of tests, short name
+    """
+    profile_split = profile.split('-')
+    profile_namespace = '_'.join([profile_split[-1]] + profile_split[:-1])
+    path_table = get_path_table()
+    command_modules = path_table['mod']
+    # extensions = path_table['ext'].items()
+    mod_path = command_modules[mod_name]
+    file_path = mod_path
+    for comp in mod_name.split('-'):
+        file_path = os.path.join(file_path, comp)
+
+    mod_data = {
+        # Modules don't technically have azure-cli-foo moniker anymore, but preserving
+        # for consistency.
+        'alt_name': '{}{}'.format(COMMAND_MODULE_PREFIX, mod_name),
+        'filepath': os.path.join(
+            mod_path, 'tests', profile_namespace),
+        'base_path': 'azure.cli.command_modules.{}.tests.{}'.format(mod_name, profile_namespace),
+        'files': {}
+    }
+    print(mod_name, mod_path, mod_data)
+    test_list = []
+    tests = _discover_module_tests(mod_name, mod_data)
+    for _, testclass in tests['files'].items():
+        for _, test in testclass.items():
+            test_list.extend(test)
+    return test_list
 
 
 def _discover_module_tests(mod_name, mod_data):
@@ -268,6 +304,7 @@ def _discover_tests(profile):
             'base_path': 'azure.cli.command_modules.{}.tests.{}'.format(mod_name, profile_namespace),
             'files': {}
         }
+        # print(mod_name, mod_path, mod_data)
         tests = _discover_module_tests(mod_name, mod_data)
         if tests:
             module_data[mod_name] = tests
